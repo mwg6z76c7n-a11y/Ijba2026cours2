@@ -39,9 +39,10 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <!-- PapaParse pour lire le CSV -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js" integrity="sha512-V9879uE76zB0Kj+1B96p21T9wDk/rK7K9W7p5hM/N5p0/6V4N2/0p/5W4T5H9/0n/1z4W2/2+1F0z4W6/2+1F0z4W6/2+1F0z4W6" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <script>
+        console.log("Démarrage du script de la carte...");
         // Initialiser la carte sur Bordeaux
         const map = L.map('map').setView([44.837789, -0.57918], 11);
 
@@ -51,7 +52,7 @@
         }).addTo(map);
 
         // Charger et parser le CSV directement
-        const csvFile = 'RAW_met_lieux_inclusion_numerique - RAW_met_lieux_inclusion_numerique.csv';
+        const csvFile = 'lieux_inclusion.csv';
 
         Papa.parse(csvFile, {
             download: true,

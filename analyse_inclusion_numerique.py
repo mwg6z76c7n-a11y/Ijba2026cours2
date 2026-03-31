@@ -59,5 +59,5 @@ def analyser_csv(file_path):
         print(f"Une erreur est survenue : {e}")
 
 if __name__ == "__main__":
-    csv_filename = 'RAW_met_lieux_inclusion_numerique - RAW_met_lieux_inclusion_numerique.csv'
+    csv_filename = 'lieux_inclusion.csv'
     analyser_csv(csv_filename)
