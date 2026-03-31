@@ -22,14 +22,10 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             max-width: 300px;
         }
-        /* Style pour le cœur rose */
-        .heart-marker {
-            color: #ff69b4; /* Rose (HotPink) */
-            font-size: 24px;
-            text-align: center;
-            line-height: 24px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            cursor: pointer;
+        /* Style pour l'icône personnalisée */
+        .custom-heart-icon {
+            background: none !important;
+            border: none !important;
         }
     </style>
 </head>
@@ -51,7 +47,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <script>
-        console.log("Démarrage du script de la carte...");
         // Initialiser la carte sur Bordeaux
         const map = L.map('map').setView([44.837789, -0.57918], 11);
 
@@ -60,15 +55,20 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        // Définir l'icône en forme de cœur
+        // Définir l'icône en forme de cœur rose (SVG pour être sûr du rendu)
+        const heartSvg = `
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="#ff69b4" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+        `;
+
         const heartIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: "<div class='heart-marker'>❤</div>",
+            className: 'custom-heart-icon',
+            html: heartSvg,
             iconSize: [30, 30],
-            iconAnchor: [15, 15] // Centrer le cœur sur le point GPS
+            iconAnchor: [15, 15]
         });
 
-        // Charger et parser le CSV directement
         const csvFile = './lieux_inclusion.csv';
 
         Papa.parse(csvFile, {
@@ -76,13 +76,10 @@
             header: true,
             skipEmptyLines: true,
             complete: function(results) {
-                console.log("Données chargées :", results.data.length, "lignes");
                 let count = 0;
-                results.data.forEach((row, index) => {
-                    // Remplacer les virgules éventuelles par des points
+                results.data.forEach((row) => {
                     let latStr = (row.latitude || "").toString().replace(',', '.');
                     let lonStr = (row.longitude || "").toString().replace(',', '.');
-                    
                     const lat = parseFloat(latStr);
                     const lon = parseFloat(lonStr);
                     
@@ -91,18 +88,12 @@
                             .bindPopup(`<b>${row.nom || 'Sans nom'}</b><br>${row.adresse_commune || ''}<br><i>${row.public_cible || ''}</i>`)
                             .addTo(map);
                         count++;
-                    } else {
-                        if (index < 5) console.warn("Coordonnées invalides ligne", index, row.nom, latStr, lonStr);
                     }
                 });
-                document.getElementById('stats').innerText = `${count} lieux affichés en direct depuis le CSV.`;
-                if (count === 0) {
-                    document.getElementById('stats').innerHTML += "<br><b style='color:red;'>Aucun point valide trouvé. Vérifiez la console (F12).</b>";
-                }
+                document.getElementById('stats').innerText = `${count} lieux affichés avec des cœurs roses.`;
             },
             error: function(err) {
-                document.getElementById('stats').innerHTML = "<b style='color:red;'>Erreur de chargement du CSV.</b><br>Assurez-vous de lancer la page via un serveur (Live Server).";
-                console.error("Erreur PapaParse:", err);
+                document.getElementById('stats').innerHTML = "<b style='color:red;'>Erreur de chargement.</b>";
             }
         });
     </script>
