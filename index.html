@@ -56,24 +56,35 @@
         Papa.parse(csvFile, {
             download: true,
             header: true,
+            skipEmptyLines: true,
             complete: function(results) {
+                console.log("Données chargées :", results.data.length, "lignes");
                 let count = 0;
-                results.data.forEach(row => {
-                    const lat = parseFloat(row.latitude);
-                    const lon = parseFloat(row.longitude);
+                results.data.forEach((row, index) => {
+                    // Remplacer les virgules éventuelles par des points
+                    let latStr = (row.latitude || "").toString().replace(',', '.');
+                    let lonStr = (row.longitude || "").toString().replace(',', '.');
+                    
+                    const lat = parseFloat(latStr);
+                    const lon = parseFloat(lonStr);
                     
                     if (!isNaN(lat) && !isNaN(lon)) {
                         L.marker([lat, lon])
-                            .bindPopup(`<b>${row.nom}</b><br>${row.adresse_commune}<br><i>${row.public_cible}</i>`)
+                            .bindPopup(`<b>${row.nom || 'Sans nom'}</b><br>${row.adresse_commune || ''}<br><i>${row.public_cible || ''}</i>`)
                             .addTo(map);
                         count++;
+                    } else {
+                        if (index < 5) console.warn("Coordonnées invalides ligne", index, row.nom, latStr, lonStr);
                     }
                 });
                 document.getElementById('stats').innerText = `${count} lieux affichés en direct depuis le CSV.`;
+                if (count === 0) {
+                    document.getElementById('stats').innerHTML += "<br><b style='color:red;'>Aucun point valide trouvé. Vérifiez la console (F12).</b>";
+                }
             },
             error: function(err) {
-                document.getElementById('stats').innerText = "Erreur lors du chargement du fichier CSV.";
-                console.error(err);
+                document.getElementById('stats').innerHTML = "<b style='color:red;'>Erreur de chargement du CSV.</b><br>Assurez-vous de lancer la page via un serveur (Live Server).";
+                console.error("Erreur PapaParse:", err);
             }
         });
     </script>
